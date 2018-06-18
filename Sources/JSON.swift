@@ -8,8 +8,7 @@ import Swift
 public enum JSON {
     case null
     case bool(Bool)
-    case int(Int)
-    case double(Double)
+    case number(JSONNumber)
     case string(String)
     case array([JSON])
     case dictionary([String: JSON])
@@ -24,9 +23,7 @@ extension JSON {
                 return nil
             case .bool(let value):
                 return value
-            case .int(let value):
-                return value
-            case .double(let value):
+            case .number(let value):
                 return value
             case .string(let value):
                 return value
@@ -54,9 +51,7 @@ extension JSON {
                 break
             case .bool(let value):
                 _ = set.insert(value)
-            case .int(let value):
-                _ = set.insert(value)
-            case .double(let value):
+            case .number(let value):
                 _ = set.insert(value)
             case .string(let value):
                 _ = set.insert(value)
@@ -89,10 +84,7 @@ extension JSON: Codable {
             case .bool(let value):
                 var container = encoder.singleValueContainer()
                 try container.encode(value)
-            case .int(let value):
-                var container = encoder.singleValueContainer()
-                try container.encode(value)
-            case .double(let value):
+            case .number(let value):
                 var container = encoder.singleValueContainer()
                 try container.encode(value)
             case .string(let value):
@@ -122,10 +114,8 @@ extension JSON: Codable {
                 self = .null
             } else if let value = accumulator.silence(try singleValueContainer.decode(Bool.self)) {
                 self = .bool(value)
-            } else if let value = accumulator.silence(try singleValueContainer.decode(Int.self)) {
-                self = .int(value)
-            } else if let value = accumulator.silence(try singleValueContainer.decode(Double.self)) {
-                self = .double(value)
+            } else if let value = accumulator.silence(try singleValueContainer.decode(JSONNumber.self)) {
+                self = .number(value)
             } else if let value = accumulator.silence(try singleValueContainer.decode(String.self)) {
                 self = .string(value)
             } else if let value = accumulator.silence(try singleValueContainer.decode([JSON].self)) {
@@ -173,9 +163,7 @@ extension JSON: Equatable {
             return true
         case (.bool(let x), .bool(let y)):
             return x == y
-        case (.int(let x), .int(let y)):
-            return x == y
-        case (.double(let x), .double(let y)):
+        case (.number(let x), .number(let y)):
             return x == y
         case (.string(let x), .string(let y)):
             return x == y

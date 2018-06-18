@@ -41,37 +41,37 @@ extension Dictionary: JSONConvertible {
 
 extension Double: JSONConvertible {
     func jsonValue() -> JSON {
-        return .double(self)
+        return .number(.init(self))
     }
 }
 
 extension Float: JSONConvertible {
     func jsonValue() throws -> JSON {
-        return .double(try Double(exactly: self).unwrap())
+        return .number(.init(try Double(exactly: self).unwrap()))
     }
 }
 
 extension Int: JSONConvertible {
     func jsonValue() -> JSON {
-        return .int(self)
+        return .number(.init(self))
     }
 }
 
 extension Int16: JSONConvertible {
     func jsonValue() -> JSON {
-        return .int(.init(self))
+        return .number(.init(self))
     }
 }
 
 extension Int32: JSONConvertible {
     func jsonValue() -> JSON {
-        return .int(.init(self))
+        return .number(.init(self))
     }
 }
 
 extension Int64: JSONConvertible {
     func jsonValue() -> JSON {
-        return .int(.init(self))
+        return .number(.init(self))
     }
 }
 
@@ -149,25 +149,25 @@ extension NSString: JSONConvertible {
 
 extension UInt: JSONConvertible {
     func jsonValue() throws -> JSON {
-        return .int(try Int(exactly: self).unwrap())
+        return .number(try JSONNumber(exactly: self).unwrap())
     }
 }
 
 extension UInt16: JSONConvertible {
     func jsonValue() throws -> JSON {
-        return .int(try Int(exactly: self).unwrap())
+        return .number(try JSONNumber(exactly: self).unwrap())
     }
 }
 
 extension UInt32: JSONConvertible {
     func jsonValue() throws -> JSON {
-        return .int(try Int(exactly: self).unwrap())
+        return .number(try JSONNumber(exactly: self).unwrap())
     }
 }
 
 extension UInt64: JSONConvertible {
     func jsonValue() throws -> JSON {
-        return .int(try Int(exactly: self).unwrap())
+        return .number(try JSONNumber(exactly: self).unwrap())
     }
 }
 
