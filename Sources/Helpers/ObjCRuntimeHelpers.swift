@@ -38,6 +38,17 @@ internal struct ObjCClass: CustomStringConvertible {
 
 infix operator ~=
 
+internal func == (lhs: ObjCClass, rhs: ObjCClass) -> Bool {
+    return lhs.value == rhs.value
+}
+
 internal func ~= (lhs: ObjCClass, rhs: ObjCClass) -> Bool {
-    return class_getSuperclass(lhs.value) == rhs.value
+    let supercls = class_getSuperclass
+    
+    return
+        supercls(lhs.value) == rhs.value ||
+        supercls(supercls(lhs.value)) == rhs.value ||
+        supercls(supercls(supercls(lhs.value))) == rhs.value ||
+        supercls(supercls(supercls(supercls(lhs.value)))) == rhs.value ||
+        supercls(supercls(supercls(supercls(supercls(lhs.value))))) == rhs.value
 }

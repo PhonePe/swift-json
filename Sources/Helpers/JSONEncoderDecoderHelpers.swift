@@ -13,7 +13,7 @@ extension JSONEncoder {
     
     /// Use this instead of `JSONEncoder.encode(_:)`.
     public func extendedEncodeToString<T: Encodable>(_ value: T) throws -> String {
-        return String(data: try encode(ExtendedEncodable(value)), encoding: .utf8)! //swiftlint:disable:this force_unwrapping
+        return try String(data: try encode(ExtendedEncodable(value)), encoding: .utf8).unwrap()
     }
 }
 
@@ -25,13 +25,18 @@ extension JSONDecoder {
     
     /// Use this instead of `JSONDecoder.decode(_:)`.
     public func extendedDecode<T: Decodable>(_ type: T.Type, from string: String) throws -> T {
-        return try decode(ExtendedDecodable<T>.self, from: string.data(using: .utf8)!).value //swiftlint:disable:this force_unwrapping
+        return try decode(ExtendedDecodable<T>.self, from: string.data(using: .utf8).unwrap()).value
     }
 }
 
 extension Encodable {
-    public func toJSONString() throws -> String {
-        return try JSONEncoder().extendedEncodeToString(self)
+    public func toJSONString(prettyPrint: Bool = false) throws -> String {
+        let encoder = JSONEncoder()
+        if #available(iOS 11.0, *) {
+            encoder.outputFormatting = .sortedKeys
+        }
+        encoder.outputFormatting.formUnion(prettyPrint ? [.prettyPrinted] : [])
+        return try encoder.extendedEncodeToString(self)
     }
 }
 

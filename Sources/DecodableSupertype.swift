@@ -23,6 +23,12 @@ extension opaque_DecodableSupertype where Self: DecodableSupertype {
     }
 }
 
+extension opaque_DecodableSupertype where Self: DecodableSupertype, Self.TypeIdentifier: Hashable {
+    public static func opaque_ProxyDecodableType() -> (opaque_ProxyDecodable & Decodable).Type {
+        return SupertypeProxyDecodableWithHashableTypeIdentifier<Self>.self
+    }
+}
+
 // MARK: - Protocols -
 
 public protocol DecodableSupertype: opaque_DecodableSupertype {
@@ -33,9 +39,27 @@ public protocol DecodableSupertype: opaque_DecodableSupertype {
     
     static func typeIdentifier() -> TypeIdentifier
     static func decodeTypeIdentifier(from _: Decoder) throws -> TypeIdentifier
+    static func fallbackCovariant(for _: TypeIdentifier) throws -> Any.Type
+}
+
+extension DecodableSupertype {
+    public static func fallbackCovariant(for _: TypeIdentifier) throws -> Any.Type {
+        throw JSONRuntimeError.noFallbackCovariantForSupertype(Self.self)
+    }
 }
 
 // MARK: - Proxy Decodables -
+
+private func covariant<T: DecodableSupertype>(forSupertype: T.Type, decoder: Decoder) throws -> T.Type {
+    let typeIdentifier = try T.decodeTypeIdentifier(from: decoder)
+    let type = try T.covariants.lazy.map({ try cast($0) as T.Type }).filter({ $0.typeIdentifier() == typeIdentifier }).first
+    
+    if let type = type {
+        return type
+    } else {
+        return try cast(try T.fallbackCovariant(for: typeIdentifier))
+    }
+}
 
 public struct SupertypeProxyDecodable<T: DecodableSupertype>: Decodable, opaque_ProxyDecodable {
     public var value: T
@@ -45,9 +69,42 @@ public struct SupertypeProxyDecodable<T: DecodableSupertype>: Decodable, opaque_
     }
     
     public init(from decoder: Decoder) throws {
+        value = try covariant(forSupertype: T.self, decoder: decoder).init(from: decoder)
+    }
+}
+
+fileprivate var typeIdentifierMap: [ObjectIdentifier: [Int: Any.Type]] = [:]
+
+public struct SupertypeProxyDecodableWithHashableTypeIdentifier<T: DecodableSupertype>: Decodable, opaque_ProxyDecodable where T.TypeIdentifier: Hashable {
+    public var value: T
+    
+    public func opaque_getValue() -> Any {
+        return value
+    }
+    
+    public init(from decoder: Decoder) throws {
         let typeIdentifier = try T.decodeTypeIdentifier(from: decoder)
-        let type = try T.covariants.lazy.map({ try cast($0) as T.Type }).filter({ $0.typeIdentifier() == typeIdentifier }).first.unwrap()
-        value = try type.init(from: decoder)
+        
+        if let type = typeIdentifierMap[ObjectIdentifier(T.self)]?[typeIdentifier.hashValue] as? T.Type
+        {
+            value = try type.init(from: decoder)
+        }
+        
+        else
+        {
+            let type = try covariant(forSupertype: T.self, decoder: decoder)
+
+            value = try type.init(from: decoder)
+            
+            let selfID = ObjectIdentifier(T.self)
+            
+            if typeIdentifierMap.index(forKey: selfID) == nil
+            {
+                typeIdentifierMap[selfID] = [:]
+            }
+            
+            typeIdentifierMap[selfID]![typeIdentifier.hashValue] = type
+        }
     }
 }
 

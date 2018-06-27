@@ -17,6 +17,24 @@ public enum JSON {
 // MARK: - Extensions -
 
 extension JSON {
+    
+    public var isEmpty: Bool {
+        switch self {
+            case .null:
+                return true
+            case .bool(_):
+                return false
+            case .number(_):
+                return false
+            case .string(let value):
+                return value.isEmpty
+            case .array(let value):
+                return value.isEmpty
+            case .dictionary(let value):
+                return value.isEmpty
+        }
+    }
+
     public var rawValue: Any? {
         switch self {
             case .null:
@@ -182,7 +200,7 @@ extension JSON: Equatable {
 
 // A helper struct that allows an arbitrary `String` to be used as a coding key.
 // Never use this directly.
-private struct JSONCodingKeys: CodingKey {
+internal struct JSONCodingKeys: CodingKey {
     var stringValue: String
     
     init(stringValue: String) {

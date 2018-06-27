@@ -48,7 +48,7 @@ extension KeyedDecodingContainerProtocol {
     }
     
     public func decodeJSONObject(forKey key: Key) throws -> Any? {
-        return try _safeDecodeIfPresent(JSON.self, forKey: key)?.toUnwrappedJSONObject()
+        return try decode(optional: JSON.self, forKey: key)?.toUnwrappedJSONObject()
     }
     
     public func decodeJSONObject(forKey key: Key) throws -> [String: Any] {
@@ -56,7 +56,17 @@ extension KeyedDecodingContainerProtocol {
     }
     
     public func decodeJSONObject(forKey key: Key) throws -> [String: Any]? {
-        return try castIfNotNil(_safeDecodeIfPresent(JSON.self, forKey: key)?.toUnwrappedJSONObject())
+        return try castIfNotNil(decode(optional: JSON.self, forKey: key)?.toUnwrappedJSONObject())
+    }
+    
+    public func decodeJSONObject(forKey key: Key) throws -> [String: [String: Any]] {
+        let object = try decodeJSONObject(forKey: key) as [String: Any]
+        return try object.mapValues({ try cast($0) })
+    }
+    
+    public func decodeJSONObject(forKey key: Key) throws -> [String: [String: Any]]? {
+        let object = try decodeJSONObject(forKey: key) as [String: Any]?
+        return try object?.mapValues({ try cast($0) })
     }
     
     public func decodeJSONObject(forKey key: Key) throws -> [Any] {
@@ -64,6 +74,6 @@ extension KeyedDecodingContainerProtocol {
     }
     
     public func decodeJSONObject(forKey key: Key) throws -> [Any]? {
-        return try castIfNotNil(_safeDecodeIfPresent(JSON.self, forKey: key)?.toUnwrappedJSONObject())
+        return try castIfNotNil(decode(optional: JSON.self, forKey: key)?.toUnwrappedJSONObject())
     }
 }

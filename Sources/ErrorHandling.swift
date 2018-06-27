@@ -37,7 +37,8 @@ public struct AccumulatedErrors: CustomStringConvertible, Error {
     }
 }
 
-public enum RuntimeError: Error {
+public enum JSONRuntimeError: Error {
     case irrepresentableNumber(NSNumber)
     case invalidTypeCast(from: Any.Type, to: Any.Type)
+    case noFallbackCovariantForSupertype(Any.Type)
 }
