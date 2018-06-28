@@ -12,11 +12,11 @@ public struct ErrorAccumulator {
         self.value = []
     }
     
-    mutating func add(_ error: Error) {
+    public mutating func add(_ error: Error) {
         value.append(error)
     }
     
-    mutating func silence<T>(_ expr: (@autoclosure () throws -> T)) -> T? {
+    public mutating func silence<T>(_ expr: (@autoclosure () throws -> T)) -> T? {
         do {
             return try expr()
         } catch {
@@ -25,15 +25,33 @@ public struct ErrorAccumulator {
         }
     }
     
-    public func accumulated() -> AccumulatedErrors {
-        return .init(errors: value)
+    public func accumulated(file: StaticString = #file, function: StaticString = #function, line: Int = #line) -> AccumulatedErrors {
+        return .init(errors: value, file: file, function: function, line: line)
     }
 }
 
 public struct AccumulatedErrors: CustomStringConvertible, Error {
     public let errors: [Error]
+    public let file: StaticString
+    public let function: StaticString
+    public let line: Int
+    
+    public init(errors: [Error], file: StaticString = #file, function: StaticString = #function, line: Int = #line) {
+        self.errors = errors
+        self.file = file
+        self.function = function
+        self.line = line
+    }
     public var description: String {
-        return errors.description
+        return "Error in file: \(file), line: \(line), function: \(function): \(errors.description)"
+    }
+    
+    public var name: String {
+        if let first = errors.first {
+            return String(describing: first)
+        } else {
+            return "Empty error in file: \(file), line: \(line), function: \(function)"
+        }
     }
 }
 
@@ -41,4 +59,12 @@ public enum JSONRuntimeError: Error {
     case irrepresentableNumber(NSNumber)
     case invalidTypeCast(from: Any.Type, to: Any.Type)
     case noFallbackCovariantForSupertype(Any.Type)
+    case stringEncodingError
+    case unexpectedlyFoundNil(file: StaticString, function: StaticString, line: UInt)
+}
+
+extension Optional {
+    public func unwrapOrThrowJSONRuntimeError(file: StaticString = #file, function: StaticString = #function, line: UInt = #line) throws -> Wrapped {
+        return try unwrapOrThrow(JSONRuntimeError.unexpectedlyFoundNil(file: file, function: function, line: line))
+    }
 }

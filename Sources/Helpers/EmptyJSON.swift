@@ -4,7 +4,7 @@
 
 import Swift
 
-internal struct EmptyJSON<T>: Decodable {
+public struct EmptyJSON<T>: Decodable {
     public let value: T?
     
     public init(from decoder: Decoder) throws {

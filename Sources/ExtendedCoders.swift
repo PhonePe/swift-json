@@ -34,7 +34,7 @@ public struct ExtendedDecoder: Decoder {
 }
 
 /// A proxy for `Decodable` that forces our custom decoder to be used.
-public struct ExtendedDecodable<T: Decodable>: Decodable {
+internal struct ExtendedDecodable<T: Decodable>: Decodable {
     public var value: T
     
     public init(from decoder: Decoder) throws {
@@ -76,7 +76,7 @@ public struct ExtendedEncoder: Encoder {
 }
 
 /// A proxy for `Encodable` that forces our custom encoder to be used.
-public struct ExtendedEncodable<T: Encodable>: Encodable {
+internal struct ExtendedEncodable<T: Encodable>: Encodable {
     public var value: T
     public init(_ value: T) {
         self.value = value

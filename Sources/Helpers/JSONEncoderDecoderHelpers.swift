@@ -32,9 +32,6 @@ extension JSONDecoder {
 extension Encodable {
     public func toJSONString(prettyPrint: Bool = false) throws -> String {
         let encoder = JSONEncoder()
-        if #available(iOS 11.0, *) {
-            encoder.outputFormatting = .sortedKeys
-        }
         encoder.outputFormatting.formUnion(prettyPrint ? [.prettyPrinted] : [])
         return try encoder.extendedEncodeToString(self)
     }

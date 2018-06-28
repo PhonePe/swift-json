@@ -94,11 +94,10 @@ extension JSON {
 
 extension JSON: Codable {
     public func encode(to encoder: Encoder) throws {
-        if case .null = self {
-            return
-        }
-        
         switch self {
+            case .null:
+                var container = encoder.singleValueContainer()
+                try container.encodeNil()
             case .bool(let value):
                 var container = encoder.singleValueContainer()
                 try container.encode(value)
@@ -114,8 +113,6 @@ extension JSON: Codable {
             case .dictionary(let value):
                 var container = encoder.container(keyedBy: JSONCodingKeys.self)
                 try value.forEach({ try container.encode($0.value, forKey: .init(stringValue: $0.key)) })
-            default:
-                return
         }
     }
     

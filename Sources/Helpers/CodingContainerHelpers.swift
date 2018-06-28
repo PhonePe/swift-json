@@ -20,19 +20,11 @@ extension KeyedDecodingContainerProtocol {
     internal func _decode<T: Decodable>(optional type: T.Type, forKey key: Key) throws -> T? {
         do {
             return try decodeIfPresent(T.self, forKey: key)
-        } catch {
-            if case DecodingError.keyNotFound(_, _) = error {
-                return nil
-            } else if case DecodingError.valueNotFound(_, _) = error {
-                return nil
-            } else if case DecodingError.typeMismatch(_, _) = error {
-                do {
-                    return try decode(EmptyJSON<T>.self, forKey: key).value
-                } catch {
-                    throw error
-                }
-            } else {
-                throw error
+        } catch(let firstError) {
+            do {
+                return try decode(EmptyJSON<T>.self, forKey: key).value
+            } catch {
+                throw AccumulatedErrors(errors: [firstError, error])
             }
         }
     }
@@ -58,19 +50,11 @@ extension SingleValueDecodingContainer {
         }
         do {
             return try decode(T.self)
-        } catch {
-            if case DecodingError.keyNotFound(_, _) = error {
-                return nil
-            } else if case DecodingError.valueNotFound(_, _) = error {
-                return nil
-            } else if case DecodingError.typeMismatch(_, _) = error {
-                do {
-                    return try decode(EmptyJSON<T>.self).value
-                } catch {
-                    throw error
-                }
-            } else {
-                throw error
+        } catch(let firstError) {
+            do {
+                return try decode(EmptyJSON<T>.self).value
+            } catch {
+                throw AccumulatedErrors(errors: [firstError, error])
             }
         }
     }
@@ -79,7 +63,7 @@ extension SingleValueDecodingContainer {
         return .init(try _decode(optional: T.Wrapped.self))
     }
     
-    public func decode<T: Decodable>(optional type: T) throws -> T? {
+    public func decode<T: Decodable>(optional type: T.Type) throws -> T? {
         return .init(try _decode(optional: T.self))
     }
     
@@ -97,19 +81,7 @@ extension UnkeyedDecodingContainer {
         do {
             return try decodeIfPresent(T.self)
         } catch {
-            if case DecodingError.keyNotFound(_, _) = error {
-                return nil
-            } else if case DecodingError.valueNotFound(_, _) = error {
-                return nil
-            } else if case DecodingError.typeMismatch(_, _) = error {
-                do {
-                    return try decode(EmptyJSON<T>.self).value
-                } catch {
-                    throw error
-                }
-            } else {
-                throw error
-            }
+            throw error
         }
     }
     
@@ -117,7 +89,7 @@ extension UnkeyedDecodingContainer {
         return .init(try _decode(optional: T.Wrapped.self))
     }
     
-    public mutating func decode<T: Decodable>(optional type: T) throws -> T? {
+    public mutating func decode<T: Decodable>(optional type: T.Type) throws -> T? {
         return .init(try _decode(optional: T.self))
     }
     

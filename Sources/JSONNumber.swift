@@ -39,6 +39,16 @@ extension JSONNumber {
 public struct JSONNumber: Codable {
     private var storage: Storage
     
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.storage = try container.decode(Storage.self)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(storage)
+    }
+
     public var rawValue: Any {
         return integerValue ?? doubleValue
     }
