@@ -29,11 +29,22 @@ extension JSONDecoder {
     }
 }
 
+extension JSON {
+    public func decode<T: Decodable>(as type: T.Type = T.self) throws -> T {
+        return try JSONDecoder().extendedDecode(T.self, from: try toData().unwrapOrThrowJSONRuntimeError())
+    }
+}
+
 extension Encodable {
-    public func toJSONString(prettyPrint: Bool = false) throws -> String {
+    public func toJSONString(prettyPrint: Bool = false) -> String? {
         let encoder = JSONEncoder()
+        
+        if #available(iOS 11.0, *) {
+            encoder.outputFormatting = .sortedKeys
+        }
+        
         encoder.outputFormatting.formUnion(prettyPrint ? [.prettyPrinted] : [])
-        return try encoder.extendedEncodeToString(self)
+        return try? encoder.extendedEncodeToString(self)
     }
 }
 

@@ -16,25 +16,12 @@ extension KeyedDecodingContainerProtocol {
 // MARK: - Optional Decoding -
 
 extension KeyedDecodingContainerProtocol {
-    
-    internal func _decode<T: Decodable>(optional type: T.Type, forKey key: Key) throws -> T? {
-        do {
-            return try decodeIfPresent(T.self, forKey: key)
-        } catch(let firstError) {
-            do {
-                return try decode(EmptyJSON<T>.self, forKey: key).value
-            } catch {
-                throw AccumulatedErrors(errors: [firstError, error])
-            }
-        }
-    }
-    
     public func decode<T: Decodable & OptionalProtocol>(optional type: T.Wrapped.Type, forKey key: Key) throws -> T where T.Wrapped: Decodable {
-        return .init(try _decode(optional: T.Wrapped.self, forKey: key))
+        return .init(try decodeIfPresentWithRecovery(T.Wrapped.self, forKey: key))
     }
     
     public func decode<T: Decodable>(optional type: T.Type, forKey key: Key) throws -> T? {
-        return .init(try _decode(optional: T.self, forKey: key))
+        return .init(try decodeIfPresentWithRecovery(T.self, forKey: key))
     }
 
     public func decode<T: Decodable & OptionalProtocol>(forKey key: Key) throws -> T where T.Wrapped: Decodable {
@@ -44,27 +31,12 @@ extension KeyedDecodingContainerProtocol {
 
 extension SingleValueDecodingContainer {
     
-    internal func _decode<T: Decodable>(optional type: T.Type) throws -> T? {
-        guard !decodeNil() else {
-            return nil
-        }
-        do {
-            return try decode(T.self)
-        } catch(let firstError) {
-            do {
-                return try decode(EmptyJSON<T>.self).value
-            } catch {
-                throw AccumulatedErrors(errors: [firstError, error])
-            }
-        }
-    }
-    
     public func decode<T: Decodable & OptionalProtocol>(optional type: T.Wrapped.Type) throws -> T where T.Wrapped: Decodable {
-        return .init(try _decode(optional: T.Wrapped.self))
+        return .init(try decodeIfPresentWithRecovery(T.Wrapped.self))
     }
     
     public func decode<T: Decodable>(optional type: T.Type) throws -> T? {
-        return .init(try _decode(optional: T.self))
+        return .init(try decodeIfPresentWithRecovery(T.self))
     }
     
     public func decode<T: Decodable & OptionalProtocol>() throws -> T where T.Wrapped: Decodable {
@@ -74,23 +46,12 @@ extension SingleValueDecodingContainer {
 
 extension UnkeyedDecodingContainer {
     
-    internal mutating func _decode<T: Decodable>(optional type: T.Type) throws -> T? {
-        guard !isAtEnd else {
-            return nil
-        }
-        do {
-            return try decodeIfPresent(T.self)
-        } catch {
-            throw error
-        }
-    }
-    
     public mutating func decode<T: Decodable & OptionalProtocol>(optional type: T.Wrapped.Type) throws -> T where T.Wrapped: Decodable {
-        return .init(try _decode(optional: T.Wrapped.self))
+        return .init(try decodeIfPresentWithRecovery(T.Wrapped.self))
     }
     
     public mutating func decode<T: Decodable>(optional type: T.Type) throws -> T? {
-        return .init(try _decode(optional: T.self))
+        return .init(try decodeIfPresentWithRecovery(T.self))
     }
     
     public mutating func decode<T: Decodable & OptionalProtocol>() throws -> T where T.Wrapped: Decodable {

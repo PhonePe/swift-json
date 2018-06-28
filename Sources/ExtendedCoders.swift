@@ -39,10 +39,18 @@ internal struct ExtendedDecodable<T: Decodable>: Decodable {
     
     public init(from decoder: Decoder) throws {
         let decoder = ExtendedDecoder(decoder)
-        if let type = T.self as? opaque_DecodableSupertype.Type {
-            self.value = try cast(try type.opaque_ProxyDecodableType().init(from: decoder).opaque_getValue()) as T
-        } else {
-            self.value = try T.init(from: decoder)
+        do {
+            if let type = T.self as? opaque_DecodableSupertype.Type {
+                self.value = try cast(try type.opaque_ProxyDecodableType().init(from: decoder).opaque_getValue()) as T
+            } else {
+                self.value = try T.init(from: decoder)
+            }
+        } catch {
+            if let value = attemptContainerAgnosticRecovery(for: T.self, error: error) {
+                self.value = value
+            } else {
+                throw error
+            }
         }
     }
 }

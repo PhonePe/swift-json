@@ -5,19 +5,32 @@
 import Foundation
 import Swift
 
-public protocol OptionalProtocol {
+public protocol opaque_OptionalProtocol {
+    static var opaque_Wrapped: Any.Type { get }
+    init(none: ())
+}
+
+public protocol OptionalProtocol: opaque_OptionalProtocol {
     associatedtype Wrapped
     var wrapped: Wrapped? { get }
     init(_ wrapped: Wrapped?)
 }
 
 extension Optional: OptionalProtocol {
+    public static var opaque_Wrapped: Any.Type {
+        return Wrapped.self
+    }
+    
     public var wrapped: Wrapped? {
         return self
     }
     
     public init(_ wrapped: Wrapped?) {
         self = wrapped
+    }
+    
+    public init(none: ()) {
+        self = .none
     }
 }
 
