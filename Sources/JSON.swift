@@ -171,6 +171,12 @@ extension JSON: Codable {
     }
 }
 
+extension JSON: CustomStringConvertible {
+    public var description: String {
+        return toJSONString(prettyPrint: true) ?? "<<error encoding JSON>>"
+    }
+}
+
 extension JSON: Equatable {
     public static func == (lhs: JSON, rhs: JSON) -> Bool {
         switch (lhs, rhs) {

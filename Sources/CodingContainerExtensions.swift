@@ -9,7 +9,12 @@ import Swift
 
 extension KeyedDecodingContainerProtocol {
     public func decode<T: Decodable>(forKey key: Key) throws -> T {
-        return try decode(T.self, forKey: key)
+        do {
+            return try decode(T.self, forKey: key)
+        } catch {
+            logDecodeError(error: error, container: self, type: T.self, key: key)
+            throw error
+        }
     }
 }
 

@@ -91,7 +91,7 @@ public struct AccumulatedErrors: CustomStringConvertible, Error {
     public var traceDescription: String  {
         var description: String = ""
         var indent: String = ""
-        print(errors)
+
         for (location, error) in zip(locations.reversed(), errors.reversed())  {
             description += indent + "From \(location.description):\n"
             description += indent + error.localizedDescription
@@ -103,12 +103,12 @@ public struct AccumulatedErrors: CustomStringConvertible, Error {
 }
 
 public enum JSONRuntimeError: Error {
+    case noContainer
     case irrepresentableNumber(NSNumber)
     case invalidTypeCast(from: Any.Type, to: Any.Type)
     case noFallbackCovariantForSupertype(Any.Type)
     case stringEncodingError
     case unexpectedlyFoundNil(file: StaticString, function: StaticString, line: UInt)
-    case nilDecodeAttemptFailure(Error)
 }
 
 extension Optional {

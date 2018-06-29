@@ -28,7 +28,7 @@ extension SingleValueDecodingContainer {
             do {
                 return try decode(EmptyJSON<T>.self).value
             } catch(_) {
-                throw error
+                return try attemptContainerAgnosticRecovery(for: T.self, error: error).unwrapOrThrow(error)
             }
         }
     }
@@ -40,9 +40,7 @@ extension UnkeyedDecodingContainer {
             return nil
         }
         do {
-            let decoded = try decodeIfPresent(JSON.self)
-            
-            if let decoded = decoded {
+            if let decoded = try decodeIfPresent(JSON.self) {
                 if decoded.isEmpty {
                     return nil
                 } else {
