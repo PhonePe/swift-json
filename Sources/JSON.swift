@@ -173,7 +173,7 @@ extension JSON: Codable {
 
 extension JSON: CustomStringConvertible {
     public var description: String {
-        return toJSONString(prettyPrint: true) ?? "<<error encoding JSON>>"
+        return toJSONString_noExtended(prettyPrint: true) ?? "<<error encoding JSON>>"
     }
 }
 

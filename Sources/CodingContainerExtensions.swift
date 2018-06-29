@@ -12,7 +12,7 @@ extension KeyedDecodingContainerProtocol {
         do {
             return try decode(T.self, forKey: key)
         } catch {
-            logDecodeError(error: error, container: self, type: T.self, key: key)
+            logDecodeError(container: self, type: T.self, key: key, error: error)
             throw error
         }
     }

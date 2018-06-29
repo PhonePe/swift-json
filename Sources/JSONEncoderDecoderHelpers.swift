@@ -11,6 +11,10 @@ extension JSONEncoder {
         return try encode(ExtendedEncodable(value))
     }
     
+    internal func encodeToString_noExtended<T: Encodable>(_ value: T) throws -> String {
+        return try String(data: try encode(value), encoding: .utf8).unwrap()
+    }
+    
     /// Use this instead of `JSONEncoder.encode(_:)`.
     public func extendedEncodeToString<T: Encodable>(_ value: T) throws -> String {
         return try String(data: try encode(ExtendedEncodable(value)), encoding: .utf8).unwrap()
@@ -36,6 +40,17 @@ extension JSON {
 }
 
 extension Encodable {
+    internal func toJSONString_noExtended(prettyPrint: Bool = false) -> String? {
+        let encoder = JSONEncoder()
+        
+        if #available(iOS 11.0, *) {
+            encoder.outputFormatting = .sortedKeys
+        }
+        
+        encoder.outputFormatting.formUnion(prettyPrint ? [.prettyPrinted] : [])
+        return try? encoder.encodeToString_noExtended(self)
+    }
+
     public func toJSONString(prettyPrint: Bool = false) -> String? {
         let encoder = JSONEncoder()
         

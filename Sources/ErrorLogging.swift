@@ -13,18 +13,28 @@ public func printIfDebug(_ string: String) {
     }
 }
 
-internal func logDecodeError<Container: KeyedDecodingContainerProtocol, T: Decodable>(error: Error, container: Container, type: T.Type, key: Container.Key) {
+internal func logDecodeError<Container: KeyedDecodingContainerProtocol, T: Decodable>(container: Container, type: T.Type, key: Container.Key, error: Error) {
     
     if case DecodingError.typeMismatch(_, _) = error {
         let json = (try? container.decode(JSON.self, forKey: key).toJSONString()).flatMap({ $0 }) ?? "<<error decoding JSON>>"
-        printIfDebug("Expected \(T.self), found \(json)")
+        printIfDebug("Decoding Error: Expected \(T.self) for \(key.stringValue), found:\n\(json)")
     }
 }
 
-internal func logDecodeError<Container: SingleValueDecodingContainer, T: Decodable>(error: Error, container: Container, type: T.Type) {
+internal func logDecodeError<Container: SingleValueDecodingContainer, T: Decodable>(container: Container, type: T.Type, error: Error) {
     
     if case DecodingError.typeMismatch(_, _) = error {
         let json = (try? container.decode(JSON.self).toJSONString()).flatMap({ $0 }) ?? "<<error decoding JSON>>"
-        printIfDebug("Expected \(T.self), found \(json)")
+        printIfDebug("Decoding Error: Expected \(T.self), found:\n\(json)")
     }
+}
+
+internal func logDecodeError<Container: UnkeyedDecodingContainer, T: Decodable>(container: Container, type: T.Type, error: Error) {
+    
+    /*var container = container
+    
+    if case DecodingError.typeMismatch(_, _) = error {
+        let json = (try? container.decode(JSON.self).toJSONString()).flatMap({ $0 }) ?? "<<error decoding JSON>>"
+        printIfDebug("Decoding Error: Expected \(T.self), found:\n\(json)")
+    }*/
 }

@@ -46,7 +46,7 @@ internal struct ExtendedDecodable<T: Decodable>: Decodable {
                 self.value = try T.init(from: decoder)
             }
         } catch {
-            if let value = attemptContainerAgnosticRecovery(for: T.self, error: error) {
+            if let value = attemptContainerAgnosticDecodeRecovery(type: T.self, error: error) {
                 self.value = value
             } else {
                 throw error
