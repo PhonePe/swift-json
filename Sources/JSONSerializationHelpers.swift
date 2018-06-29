@@ -9,8 +9,12 @@ extension JSON {
     public init(jsonObject: Any?) throws {
         // TODO: Optimize by removing JSONSerialization dependency.
         if let jsonObject = jsonObject {
-            let data = try JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            self = try JSONDecoder().decode(JSON.self, from: data)
+            if jsonObject is NSNull {
+                self = .null
+            } else {
+                let data = try JSONSerialization.data(withJSONObject: jsonObject, options: [])
+                self = try JSONDecoder().decode(JSON.self, from: data)
+            }
         } else {
             self = .null
         }

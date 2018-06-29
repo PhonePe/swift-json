@@ -24,7 +24,7 @@ internal func attemptDecodeRecovery<Container: KeyedDecodingContainerProtocol, T
 internal func attemptDecodeIfPresentRecovery<Container: KeyedDecodingContainerProtocol, T: Decodable>(container: Container, type: T.Type, key: Container.Key, error: Error) -> T?? {
     
     do {
-        return try container.decode(EmptyJSON.self, forKey: key).value
+        return try container.decode(EmptyJSON.self, forKey: key).proof()
     } catch {
         
     }
@@ -35,7 +35,7 @@ internal func attemptDecodeIfPresentRecovery<Container: KeyedDecodingContainerPr
 internal func attemptDecodeIfPresentRecovery<Container: SingleValueDecodingContainer, T: Decodable>(container: Container, type: T.Type, error: Error) -> T?? {
     
     do {
-        return try container.decode(EmptyJSON.self).value
+        return try container.decode(EmptyJSON.self).proof()
     } catch {
         
     }
@@ -57,7 +57,7 @@ extension SingleValueDecodingContainer {
             return try decode(T.self)
         } catch {
             do {
-                return try decode(EmptyJSON<T>.self).value
+                return try decode(EmptyJSON.self).proof()
             } catch(_) {
                 return try attemptContainerAgnosticDecodeRecovery(type: T.self, error: error).unwrapOrThrow(error)
             }

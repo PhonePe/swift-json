@@ -4,42 +4,41 @@
 
 import Swift
 
-public struct EmptyJSON<T>: Decodable {
-    public let value: T?
-    
+public struct EmptyJSON: Decodable {    
     public init(from decoder: Decoder) throws {
-        var accumulator = ErrorAccumulator()
-        
-        if let singleValueContainer = accumulator.silence(try decoder.singleValueContainer()) {
+        if let singleValueContainer = try? decoder.singleValueContainer() {
             if singleValueContainer.decodeNil() {
-                value = nil
+                return
             } else {
                 do {
                     let json = try singleValueContainer.decode(JSON.self)
                     if json.isEmpty {
-                        value = nil
+                        return
                     } else {
-                        throw accumulator.accumulated()
+                        throw JSONRuntimeError.isNotEmpty
                     }
                 } catch {
-                    accumulator.add(error)
-                    throw accumulator.accumulated()
+                    throw JSONRuntimeError.isNotEmpty
                 }
             }
-        } else if let unkeyedContainer = accumulator.silence(try decoder.unkeyedContainer()) {
+        } else if let unkeyedContainer = try? decoder.unkeyedContainer() {
             if unkeyedContainer.isAtEnd {
-                value = nil
+                return
             } else {
-                throw accumulator.accumulated()
+                throw JSONRuntimeError.isNotEmpty
             }
-        } else if let keyedContainer = accumulator.silence(try decoder.container(keyedBy: JSONCodingKeys.self)) {
+        } else if let keyedContainer = try? decoder.container(keyedBy: JSONCodingKeys.self) {
             if keyedContainer.allKeys.isEmpty {
-                value = nil
+                return
             } else {
-                throw accumulator.accumulated()
+                throw JSONRuntimeError.isNotEmpty
             }
         } else {
-            throw accumulator.accumulated()
+            throw JSONRuntimeError.isNotEmpty
         }
+    }
+    
+    public func proof<T>() -> T? {
+        return nil
     }
 }

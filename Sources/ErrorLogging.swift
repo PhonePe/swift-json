@@ -7,8 +7,8 @@ import Swift
 
 private let debug: Bool = false
 
-extension JSON {
-    internal func toJSONStringForDebugging() -> String {
+extension Encodable {
+    public func toJSONStringForDebugging() -> String {
         let encoder = JSONEncoder()
         
         if #available(iOS 11.0, *) {

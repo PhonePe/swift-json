@@ -109,6 +109,7 @@ public enum JSONRuntimeError: Error {
     case noFallbackCovariantForSupertype(Any.Type)
     case stringEncodingError
     case unexpectedlyFoundNil(file: StaticString, function: StaticString, line: UInt)
+    case isNotEmpty
 }
 
 extension Optional {

@@ -35,6 +35,8 @@ extension JSON {
     }
 }
 
+// MARK: - String Helpers -
+
 extension Encodable {
     public func toJSONString(prettyPrint: Bool = false) -> String? {
         let encoder = JSONEncoder()
@@ -51,5 +53,20 @@ extension Encodable {
 extension Decodable {
     public init(jsonString string: String) throws {
         self = try JSONDecoder().extendedDecode(Self.self, from: string.data(using: .utf8).unwrap())
+    }
+}
+
+extension JSON {
+    public init(jsonString string: String) throws {
+        let data = try string.data(using: .utf8).unwrap()
+        do {
+            self = try JSONDecoder().decode(JSON.self, from: data)
+        } catch {
+            if let _ = try? JSONDecoder().decode(EmptyJSON.self, from: data) {
+                self = .null
+            } else {
+                throw error
+            }
+        }
     }
 }
