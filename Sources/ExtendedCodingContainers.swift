@@ -498,6 +498,10 @@ public struct ExtendedKeyedEncodingContainer<Key: CodingKey>: KeyedEncodingConta
         
     }
     
+    public mutating func encodeIfPresent<T: Encodable>(_ value: T?, forKey key: Key) throws {
+        try value.map({ try encode($0, forKey: key) })
+    }
+    
     public mutating func encode(_ value: Bool, forKey key: Key) throws {
         return try base.encode(value, forKey: key)
     }
