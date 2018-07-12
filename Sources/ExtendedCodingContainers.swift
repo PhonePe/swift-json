@@ -321,7 +321,7 @@ public struct ExtendedSingleValueEncodingContainer: SingleValueEncodingContainer
     }
     
     public mutating func encodeNil() throws {
-        return try base.encodeNil()
+
     }
     
     public mutating func encode(_ value: Bool) throws {
@@ -403,7 +403,7 @@ public struct ExtendedUnkeyedEncodingContainer: UnkeyedEncodingContainer {
     }
     
     public mutating func encodeNil() throws {
-        try base.encodeNil()
+
     }
     
     public mutating func encode(_ value: Bool) throws {
@@ -495,7 +495,7 @@ public struct ExtendedKeyedEncodingContainer<Key: CodingKey>: KeyedEncodingConta
     }
     
     public mutating func encodeNil(forKey key: Key) throws {
-        return try base.encodeNil(forKey: key)
+        
     }
     
     public mutating func encode(_ value: Bool, forKey key: Key) throws {
