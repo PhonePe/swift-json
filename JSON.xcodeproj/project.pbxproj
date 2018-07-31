@@ -175,6 +175,7 @@
 				F1987DA520C7F6130054B020 /* Frameworks */,
 				F1987DA620C7F6130054B020 /* Headers */,
 				F1987DA720C7F6130054B020 /* Resources */,
+				7A1DD1B021107879007E1977 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -238,6 +239,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		7A1DD1B021107879007E1977 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "ARCHIVE_PATH=\"${SRCROOT}/Framework\"\nrm -rf \"${ARCHIVE_PATH}\"\nmkdir \"${ARCHIVE_PATH}\"\n\ncp -LR \"${BUILT_PRODUCTS_DIR}/${PROJECT_NAME}.framework\" \"${ARCHIVE_PATH}\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		F14CC1B720C8009400E8D852 /* Sources */ = {
