@@ -39,7 +39,7 @@ public struct ErrorAccumulator {
         }
     }
     
-    public mutating func silence<T>(_ expr: (@autoclosure () throws -> T), file: StaticString = #function, function: StaticString = #function, line: Int = #line) -> T? {
+    public mutating func silence<T>(_ expr: @autoclosure () throws -> T, file: StaticString = #function, function: StaticString = #function, line: Int = #line) -> T? {
         do {
             return try expr()
         } catch {
